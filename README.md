@@ -15,3 +15,7 @@ Interview Test For Roome.id
 ```text
 go run main.go
 ```   
+6. Untuk menjalankan program ini , anda dapat dipermudah dengan menggunakan postman , 
+  berikut ini share postman url yang bisa digunakan :
+  
+  https://www.getpostman.com/collections/c96dd2dbf6e30e25bbc6
