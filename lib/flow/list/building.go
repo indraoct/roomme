@@ -47,33 +47,14 @@ func GetBuildingList(db *sql.DB, slug string, page int, limit int, filter Filter
 	
 	if page > 0 && limit > 0 {
 		offset := page -1
-		limitSql = "LIMIT "+strconv.Itoa(offset)+","+strconv.Itoa(limit)
+		limitSql = "LIMIT "+strconv.Itoa(limit)+" OFFSET "+strconv.Itoa(offset)
 	}else{
 		page = 1
 		limit = 10
-		limitSql = "LIMIT 0,10"
+		limitSql = "LIMIT 10 OFFSET 0"
 	}
 	
-	// query for total data
-	rowsForCount, err := db.Query("SELECT b.build_id," +
-		"b.build_name," +
-		"b.build_total_room," +
-		"ow.owner_phone AS owner_phone," +
-		"b.build_kabupaten, " +
-		"b.build_audit "+
-		"FROM building b  " +
-		" LEFT JOIN owner ow ON b.build_id = ow.owner_building_id" +
-		" WHERE 1 = 1 "+
-		" ORDER BY b.build_id desc ")
-	
-	//calculated count data
-	countAllData := 0
-	for rowsForCount.Next(){
-		countAllData++
-	}
-	
-	//query for filter
-	rows, err := db.Query("SELECT b.build_id," +
+	sqlString := "SELECT b.build_id," +
 		"b.build_name," +
 		"b.build_total_room," +
 		"ow.owner_phone AS owner_phone," +
@@ -82,7 +63,19 @@ func GetBuildingList(db *sql.DB, slug string, page int, limit int, filter Filter
 		"FROM building b  " +
 		" LEFT JOIN owner ow ON b.build_id = ow.owner_building_id" +
 		" WHERE 1 = 1 "+whereSql+
-		" ORDER BY b.build_id desc "+limitSql)
+		" ORDER BY b.build_id desc "
+	
+	// query for total data
+	rowsForCount, err := db.Query(sqlString)
+	
+	//calculated count data
+	countAllData := 0
+	for rowsForCount.Next(){
+		countAllData++
+	}
+	
+	//query for limit and paging
+	rows, err := db.Query(sqlString+limitSql)
 	if err != nil {
 		return response, errors.New("Data Not Found!")
 	}
@@ -116,7 +109,13 @@ func GetBuildingList(db *sql.DB, slug string, page int, limit int, filter Filter
 	}
 	
 	params = append(params,strconv.Itoa(page),strconv.Itoa(limit),urlStatus,urlBuildingName)
-	response = getSuccessResponsePaging(slug,constanta.STATUS_OK,"array",build_list_response,len(build_list_response),countAllData,params)
+	response = getSuccessResponsePaging(slug,
+		constanta.STATUS_OK,
+		"array",
+		build_list_response,
+		len(build_list_response),
+		countAllData,
+		params)
 	
 	return response,nil
 }

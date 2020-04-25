@@ -40,7 +40,12 @@ func getSuccessResponsePaging(slug string,code int, tipe string, data interface{
 	s.Data 		= data
 	s.TotalData = total_data
 	s.Page      = page
-	s.TotalPage = int(math.Ceil(helper.FloatDiv(float64(total_data),float64(length_current_date))))
+	if length_current_date > 0 {
+		s.TotalPage = int(math.Ceil(helper.FloatDiv(float64(total_data), float64(length_current_date))))
+	}else{
+		s.TotalPage = 0
+	}
+	
 	s.NextPage 	= ""
 	s.FirstPage = ""
 	s.LastPage	= ""
