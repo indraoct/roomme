@@ -1,9 +1,9 @@
 package model
 
-type Building struct {
+type BuildingList struct {
 	BuildId             int     `json:"build_id"`
 	BuildName           string  `json:"build_name"`
 	BuildTotalRoom      string  `json:"build_total_room"`
-	BuildNoContact      string  `json:"build_no_contact"`
+	OwnerPhone          string  `json:"owner_phone"`
 	BuildKabupaten      string  `json:"build_kabupaten"`
 }

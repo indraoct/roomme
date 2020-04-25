@@ -2,10 +2,11 @@ package main
 
 import (
 	"database/sql"
-	"net/http"
-	"time"
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
+	"net/http"
+	"roomme/controller"
+	"time"
 )
 
 func ConnectDb() (*sql.DB, error) {
@@ -24,7 +25,11 @@ func ConnectDb() (*sql.DB, error) {
 
 func main(){
 	
+	db,_ := ConnectDb()
 	
+	http.HandleFunc("/building/list", func(w http.ResponseWriter, r *http.Request) {
+		controller.BuildingList(db, w, r)
+	})
 	
 	fmt.Println("server started at localhost:9000")
 	err := http.ListenAndServe(":9000", nil)
