@@ -28,7 +28,7 @@ func main(){
 	db,_ := ConnectDb()
 	
 	http.HandleFunc("/building/list", func(w http.ResponseWriter, r *http.Request) {
-		controller.BuildingList(db, w, r)
+			controller.BuildingList(db, w, r)
 	})
 	
 	fmt.Println("server started at localhost:9000")
