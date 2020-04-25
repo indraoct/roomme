@@ -40,6 +40,9 @@ func getSuccessResponsePaging(slug string,code int, tipe string, data interface{
 	s.Data 		= data
 	s.TotalData = total_data
 	s.Page      = page
+	s.Message   = "Success"
+	s.Status    = "Success"
+	
 	if length_current_date > 0 {
 		s.TotalPage = int(math.Ceil(helper.FloatDiv(float64(total_data), float64(length_current_date))))
 	}else{
