@@ -32,8 +32,15 @@ type ErrorResponse struct {
 
 func getSuccessResponsePaging(slug string,code int, tipe string, data interface{},length_current_date int, total_data int, params []string) SuccessResponse{
 	
-	page, _  := strconv.Atoi(params[0])
-	limit, _ := strconv.Atoi(params[1])
+	var page,limit int
+	
+	if len(params) > 0 {
+		page, _ = strconv.Atoi(params[0])
+		limit, _ = strconv.Atoi(params[1])
+	}else{
+		page = 1
+		limit = 1
+	}
 	s := SuccessResponse{}
 	s.Code 		= code
 	s.Type 		= tipe

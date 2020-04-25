@@ -8,6 +8,7 @@ import (
 	"strconv"
 )
 
+//Building List [GET]
 func BuildingList(db *sql.DB, w http.ResponseWriter, r *http.Request){
 	
 	if HTTPMethodMustBe("GET",w,r) == false{
@@ -39,6 +40,47 @@ func BuildingList(db *sql.DB, w http.ResponseWriter, r *http.Request){
 	return
 }
 
+//Building Detail [GET]
 func BuildingDetail(db *sql.DB, w http.ResponseWriter, r *http.Request){
+	if HTTPMethodMustBe("GET",w,r) == false{
+		return
+	}
+	
+	build_id,_   := strconv.Atoi(r.URL.Query().Get("build_id"))
+	response, err := list.GetBuildingDetail(db,"building/list",build_id)
+	
+	if err != nil{
+		ResponseError(err,w,r)
+		return
+	}
+	
+	outputjson,_ := json.Marshal(response)
+	
+	w.Header().Set("Content-Type","application/json")
+	w.WriteHeader(200)
+	w.Write(outputjson)
+	return
+}
 
+//Building Audit  [POST]
+func BuildingAudit(db *sql.DB, w http.ResponseWriter, r *http.Request){
+	
+	if HTTPMethodMustBe("POST",w,r) == false{
+		return
+	}
+	
+	build_id,_   := strconv.Atoi(r.URL.Query().Get("build_id"))
+	response, err := list.BuildingAudit(db,"building/list",build_id)
+	
+	if err != nil{
+		ResponseError(err,w,r)
+		return
+	}
+	
+	outputjson,_ := json.Marshal(response)
+	
+	w.Header().Set("Content-Type","application/json")
+	w.WriteHeader(200)
+	w.Write(outputjson)
+	return
 }

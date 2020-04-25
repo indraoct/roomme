@@ -23,6 +23,7 @@ type BuildingListResponse struct {
 	BuildAudit          string  `json:"build_audit"`
 }
 
+// Get Building List
 func GetBuildingList(db *sql.DB, slug string, page int, limit int, filter FilterBuilding) (response SuccessResponse, err error){
 	
 	var building        model.BuildingList
@@ -136,4 +137,55 @@ func GetAuditStatusString(audit_status int) (audit_string string){
 	}
 	
 	return audit_string
+}
+
+//Get Building Detail
+func GetBuildingDetail(db *sql.DB, slug string, build_id int)(response SuccessResponse, err error){
+	var building        model.BuildingList
+	//var doc             model.Document
+	//var arr_doc         []model.Document
+	//var audit_log       model.AuditLog
+	//var arr_audit_log   []model.AuditLog
+	//var roomType        model.Rooms
+	//var arrRoomType     []model.Rooms
+	var buildingDetail  model.BuildingDetail
+	
+	// query building
+	db.QueryRow(" SELECT b.build_id," +
+		" b.build_name," +
+		" b.build_total_room," +
+		" b.build_address," +
+		" bf.build_staff_name," +
+		" bf.build_staff_phone " +
+		" FROM building b " +
+		" LEFT JOIN build_staff bf ON bf.build_staff_build_id = b.build_id " +
+		" where b.build_id = ?",build_id).
+		Scan(&building.BuildId,
+			&building.BuildName,
+			&building.BuildTotalRoom,
+			&building.BuildAddress,
+			&building.BuildStaffname,
+			&building.BuildStaffPhone,)
+	
+	
+	buildingDetail.BuildingInfo = building
+	response = getSuccessResponsePaging(slug,
+		constanta.STATUS_OK,
+		"object",
+		buildingDetail,
+		1,
+		1,
+		[]string{})
+	
+	//TODO : The others data
+	
+	return response,nil
+}
+
+//PUT Building Audit
+func BuildingAudit(db *sql.DB, slug string, build_id int)(response SuccessResponse, err error){
+	
+	//TODO: Logic HERE
+	
+	return response,nil
 }
