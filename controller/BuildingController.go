@@ -15,6 +15,11 @@ func BuildingList(db *sql.DB, w http.ResponseWriter, r *http.Request){
 	
 	page,_      := strconv.Atoi(r.URL.Query().Get("page"))
 	limit,_     := strconv.Atoi(r.URL.Query().Get("limit"))
+	build_name  := r.URL.Query().Get("build_name")
+	build_audit := r.URL.Query().Get("build_audit")
+	
+	filter.BuildingName     = build_name
+	filter.BuildAudit,_     = strconv.Atoi(build_audit)
 	
 	response, err := list.GetBuildingList(db,"building/list",page,limit, filter)
 	

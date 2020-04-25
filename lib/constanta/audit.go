@@ -1,0 +1,8 @@
+package constanta
+
+const(
+	AUDIT_STATUS_NOT_YET   = 0
+	AUDIT_STATUS_REPEATED  = 1
+	AUDIT_STATUS_COMPLETE  = 2
+	AUDIT_ALL_STATUS       = 3
+)

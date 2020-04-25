@@ -9,7 +9,18 @@ import (
 )
 
 type FilterBuilding struct {
+	BuildAudit      int         `json:"build_audit"`
+	BuildingName    string      `json:"building_name"`
+}
 
+type BuildingListResponse struct {
+	No                  int     `json:"no"`
+	BuildId             int     `json:"build_id"`
+	BuildName           string  `json:"build_name"`
+	BuildTotalRoom      string  `json:"build_total_room"`
+	OwnerPhone          string  `json:"owner_phone"`
+	BuildKabupaten      string  `json:"build_kabupaten"`
+	BuildAudit          string  `json:"build_audit"`
 }
 
 func GetBuildingList(db *sql.DB, slug string, page int, limit int, filter FilterBuilding) (response SuccessResponse, err error){
@@ -19,6 +30,20 @@ func GetBuildingList(db *sql.DB, slug string, page int, limit int, filter Filter
 	var whereSql        string
 	var limitSql        string
 	var params          []string
+	var build_list_response []BuildingListResponse
+	
+	urlStatus := ""
+	urlBuildingName := ""
+	
+	if filter.BuildAudit != constanta.AUDIT_ALL_STATUS {
+		whereSql += " AND b.build_audit ="+strconv.Itoa(filter.BuildAudit)
+		urlBuildingName = "&build_audit="+strconv.Itoa(filter.BuildAudit)
+	}
+	
+	if filter.BuildingName != ""{
+		whereSql += " AND b.build_name LIKE '%"+filter.BuildingName+"%'"
+		urlBuildingName = "&build_name="+filter.BuildingName
+	}
 	
 	if page > 0 && limit > 0 {
 		offset := page -1
@@ -29,12 +54,31 @@ func GetBuildingList(db *sql.DB, slug string, page int, limit int, filter Filter
 		limitSql = "LIMIT 0,10"
 	}
 	
+	// query for total data
+	rowsForCount, err := db.Query("SELECT b.build_id," +
+		"b.build_name," +
+		"b.build_total_room," +
+		"ow.owner_phone AS owner_phone," +
+		"b.build_kabupaten, " +
+		"b.build_audit "+
+		"FROM building b  " +
+		" LEFT JOIN owner ow ON b.build_id = ow.owner_building_id" +
+		" WHERE 1 = 1 "+
+		" ORDER BY b.build_id desc ")
 	
+	//calculated count data
+	countAllData := 0
+	for rowsForCount.Next(){
+		countAllData++
+	}
+	
+	//query for filter
 	rows, err := db.Query("SELECT b.build_id," +
 		"b.build_name," +
 		"b.build_total_room," +
 		"ow.owner_phone AS owner_phone," +
-		"b.build_kabupaten " +
+		"b.build_kabupaten, " +
+		"b.build_audit "+
 		"FROM building b  " +
 		" LEFT JOIN owner ow ON b.build_id = ow.owner_building_id" +
 		" WHERE 1 = 1 "+whereSql+
@@ -48,14 +92,49 @@ func GetBuildingList(db *sql.DB, slug string, page int, limit int, filter Filter
 			&building.BuildName,
 			&building.BuildTotalRoom,
 			&building.OwnerPhone,
-			&building.BuildKabupaten)
+			&building.BuildKabupaten,
+			&building.BuildAudit)
 		arr_building = append(arr_building,building)
 	}
 	
 	rows.Scan(&arr_building)
 	
-	params = append(params,strconv.Itoa(page),strconv.Itoa(limit))
-	response = getSuccessResponsePaging(slug,constanta.STATUS_OK,"array",arr_building,len(arr_building),params)
+	count := 1
+	for _,data := range arr_building{
+		var build BuildingListResponse
+		build.No                    = count
+		count++
+		build.BuildId               = data.BuildId
+		build.BuildName             = data.BuildName
+		build.BuildTotalRoom        = data.BuildTotalRoom
+		build.BuildKabupaten        = data.BuildKabupaten
+		build.OwnerPhone            = data.OwnerPhone
+		build.BuildAudit            = GetAuditStatusString(data.BuildAudit)
+		
+		build_list_response = append(build_list_response,build)
+		
+	}
+	
+	params = append(params,strconv.Itoa(page),strconv.Itoa(limit),urlStatus,urlBuildingName)
+	response = getSuccessResponsePaging(slug,constanta.STATUS_OK,"array",build_list_response,len(build_list_response),countAllData,params)
 	
 	return response,nil
+}
+
+
+func GetAuditStatusString(audit_status int) (audit_string string){
+	
+	switch audit_status {
+		case constanta.AUDIT_STATUS_COMPLETE:
+			audit_string = "Audit Completed"
+		break
+		case constanta.AUDIT_STATUS_REPEATED:
+			audit_string = "Audit Ulang"
+		break
+		default:
+			audit_string = "Belum diaudit"
+		break
+	}
+	
+	return audit_string
 }

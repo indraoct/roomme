@@ -6,4 +6,5 @@ type BuildingList struct {
 	BuildTotalRoom      string  `json:"build_total_room"`
 	OwnerPhone          string  `json:"owner_phone"`
 	BuildKabupaten      string  `json:"build_kabupaten"`
+	BuildAudit          int     `json:"build_audit"`
 }
