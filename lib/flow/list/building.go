@@ -69,6 +69,10 @@ func GetBuildingList(db *sql.DB, slug string, page int, limit int, filter Filter
 	// query for total data
 	rowsForCount, err := db.Query(sqlString)
 	
+	if err != nil{
+		return response, err
+	}
+	
 	//calculated count data
 	countAllData := 0
 	for rowsForCount.Next(){
