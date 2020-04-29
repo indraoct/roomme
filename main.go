@@ -10,7 +10,7 @@ import (
 )
 
 func ConnectDb() (*sql.DB, error) {
-	db, err := sql.Open("mysql", "root:@tcp(192.168.100.15:3306)/roomme")
+	db, err := sql.Open("mysql", "developer:dev123@tcp(35.240.146.95:3306)/roomme")
 	if err != nil {
 		return nil, err
 	}
