@@ -1,10 +1,8 @@
 package helper
 
 import (
-	"encoding/json"
 	"fmt"
 	"math/rand"
-	"oropay/lib/constanta"
 	"regexp"
 	"strconv"
 	"strings"
@@ -23,18 +21,6 @@ func StringRandomWithCharset(length int, charset string) string {
 	return string(b)
 }
 
-func StringRandom(length int) string {
-	return StringRandomWithCharset(length, constanta.STRING_CHARSET)
-}
-
-func StringRandomInt(length int) string {
-	return StringRandomWithCharset(length, constanta.STRING_NUMBER)
-}
-
-func StringIsJSON(s string) bool {
-	var js map[string]interface{}
-	return json.Unmarshal([]byte(s), &js) == nil
-}
 
 func FormatToCurrency(n int) string {
 	var s []string
